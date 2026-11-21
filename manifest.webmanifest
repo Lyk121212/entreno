@@ -1,0 +1,22 @@
+{
+  "name": "Entreno de Luis",
+  "short_name": "Entreno",
+  "description": "Pesos, repeticiones y carreras. Solo lo necesario para mejorar.",
+  "id": "./",
+  "start_url": "./#hoy",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#15171b",
+  "theme_color": "#15171b",
+  "lang": "es",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Apuntar carrera", "url": "./#carrera", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
