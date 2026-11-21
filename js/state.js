@@ -1,3 +1,4 @@
+// entreno v1.1.1
 // Estado compartido de la interfaz y ayudantes que dependen de él.
 import { createStore } from './store.js';
 import { normEjercicio, CAT } from './schema.js';

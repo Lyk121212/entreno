@@ -1,3 +1,4 @@
+// entreno v1.1.1
 // Datos locales (IndexedDB) + cola de cambios pendientes + sincronización con el Apps Script.
 import { aplicarOps, filasAEstado } from './schema.js';
 import { SEED } from './seed.js'; // rutina inicial hasta la primera sincronización

@@ -1,3 +1,4 @@
+// entreno v1.1.1
 // Vistas: cada función devuelve el HTML de una pantalla o de un diálogo.
 import { S, getEj, misEjercicios, catalogoRestante, imgUrl, thumb, semanaHTML, getDraft, store } from './state.js';
 import { historial, objetivo, evalSesion, isoWeek, r05 } from './logic.js';

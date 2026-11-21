@@ -1,3 +1,4 @@
+// entreno v1.1.1
 // Reglas de progresión, recuento semanal y elección de sesión. Sin DOM: se testea en Node.
 const pad = n => String(n).padStart(2, '0');
 export const r05 = x => Math.round(x * 2) / 2;

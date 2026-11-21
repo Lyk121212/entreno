@@ -34,4 +34,4 @@ npm test             # lógica de progresión + Code.gs en un simulador de Sheet
 node tests/e2e.mjs   # la app real en Chrome contra el simulador (necesita google-chrome)
 ```
 
-Al cambiar archivos de la app, sube `VERSION` en `sw.js` y `APP_VERSION` en `index.html` para que el móvil coja la versión nueva.
+Para publicar una versión: `python3 scripts/version.py X.Y.Z` (marca todos los archivos), pruebas, commit y push. El service worker solo instala la versión nueva cuando GitHub sirve **todos** los archivos con la misma marca, así que un despliegue a medias nunca mezcla versiones en el móvil.

@@ -1,3 +1,4 @@
+// entreno v1.1.1
 // Sesión de gimnasio en curso (borrador): se crea desde una rutina o vacía y se modifica libremente.
 // Funciones puras: reciben el borrador y devuelven uno nuevo. El guardado en localStorage lo hace la app.
 import { serieValida, historial, objetivo } from './logic.js';

@@ -1,3 +1,4 @@
+// entreno v1.1.1
 // Rutina inicial (full body A/B). Solo se usa hasta la primera sincronización con la hoja.
 const E = (id, nombre, grupo, series, repMin, repMax, incremento, notas = '') => ({ id, nombre, grupo, series, repMin, repMax, incremento, activo: true, notas });
 export const SEED = {

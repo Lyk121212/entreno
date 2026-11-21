@@ -1,3 +1,4 @@
+// entreno v1.1.1
 import { S, store, hooks, getEj, getDraft, setDraft, imgUrl } from './state.js';
 import * as V from './vistas.js';
 import * as SES from './sesion.js';

@@ -12,12 +12,19 @@ const ROOT = path.resolve(new URL('..', import.meta.url).pathname);
 const OUT = path.join(ROOT, 'tests/out'); fs.mkdirSync(OUT, { recursive: true });
 const TIPOS = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.webp': 'image/webp', '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json' };
 let servir = true;
+let mutar = null; // { v: 'x.y.z', viejo: '/js/archivo.js' } simula un despliegue nuevo, con un archivo aún viejo en el CDN
+const V0 = (fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8').match(/const VERSION = '([^']+)'/) || [])[1];
 const srv = http.createServer((q, r) => {
   if (!servir) { r.destroy(); return; }
   let p = decodeURIComponent(new URL(q.url, 'http://x').pathname); if (p.endsWith('/')) p += 'index.html';
   const f = path.join(ROOT, p);
   if (!f.startsWith(ROOT) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); return r.end(); }
-  r.writeHead(200, { 'Content-Type': TIPOS[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(r);
+  const tipo = TIPOS[path.extname(f)] || 'application/octet-stream';
+  if (mutar && /\.(html|js|css)$/.test(f) && p !== mutar.viejo) {
+    const t = fs.readFileSync(f, 'utf8').split('entreno v' + V0).join('entreno v' + mutar.v).replace("const VERSION = '" + V0 + "'", "const VERSION = '" + mutar.v + "'").replace("APP_VERSION = '" + V0 + "'", "APP_VERSION = '" + mutar.v + "'");
+    r.writeHead(200, { 'Content-Type': tipo }); return r.end(t);
+  }
+  r.writeHead(200, { 'Content-Type': tipo }); fs.createReadStream(f).pipe(r);
 });
 await new Promise(r => srv.listen(8765, r));
 const BASE = 'http://localhost:8765/';
@@ -367,7 +374,28 @@ await ir('#hoy'); await shot('11-escritorio-hoy');
 await ir('#progreso'); await shot('12-escritorio-progreso');
 await page.setViewportSize({ width: 393, height: 851 });
 
-seccion('12. Instalabilidad y errores');
+seccion('12. Actualización atómica (CDN a medio actualizar)');
+await ir('#hoy');
+const swInfo = () => page.evaluate(async () => { const reg = await navigator.serviceWorker.getRegistration(); return { caches: await caches.keys(), v: window.APP_VERSION, activo: reg && reg.active && reg.active.scriptURL }; });
+ok((await swInfo()).caches.includes('entreno-' + V0), 'la versión actual (' + V0 + ') está instalada');
+mutar = { v: '9.9.9', viejo: '/js/vistas.js' };
+await page.evaluate(async () => { const reg = await navigator.serviceWorker.getRegistration(); try { await reg.update(); } catch (e) {} });
+await page.waitForTimeout(3000);
+let si = await swInfo();
+ok(!si.caches.includes('entreno-9.9.9') && si.caches.includes('entreno-' + V0), 'con un archivo viejo en el CDN, NO se instala la versión nueva');
+await page.reload(); await page.waitForSelector('section.ex');
+ok((await page.evaluate(() => window.APP_VERSION)) === V0 && !(await page.locator('main').innerText()).includes('Algo ha fallado'), 'la app sigue funcionando entera con la versión anterior');
+mutar = { v: '9.9.9', viejo: null };
+await page.evaluate(async () => { const reg = await navigator.serviceWorker.getRegistration(); try { await reg.update(); } catch (e) {} });
+await page.waitForTimeout(3000);
+si = await swInfo();
+ok(si.caches.includes('entreno-9.9.9') && !si.caches.includes('entreno-' + V0), 'cuando todo el CDN está al día, se instala la nueva y se borra la vieja');
+await page.reload(); await page.waitForSelector('section.ex');
+ok((await page.evaluate(() => window.APP_VERSION)) === '9.9.9', 'al reabrir, la app ya es la versión nueva');
+ok((await swInfo()).caches.includes('entreno-fotos'), 'las fotos guardadas sobreviven a la actualización');
+mutar = null;
+
+seccion('13. Instalabilidad y errores');
 const cdp = await ctx.newCDPSession(page);
 const man = await cdp.send('Page.getAppManifest');
 ok(!man.errors.length, 'manifest sin errores');

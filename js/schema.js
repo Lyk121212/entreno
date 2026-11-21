@@ -1,3 +1,4 @@
+// entreno v1.1.1
 // Esquema de la hoja de Google y conversión filas <-> estado de la app.
 // Una pestaña por colección; la primera columna es siempre "id". Debe coincidir con HOJAS en apps-script/Code.gs.
 import { CATALOGO } from './catalogo.js';
