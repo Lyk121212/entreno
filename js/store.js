@@ -1,6 +1,6 @@
 // Datos locales (IndexedDB) + cola de cambios pendientes + sincronización con el Apps Script.
 import { aplicarOps, filasAEstado } from './schema.js';
-import { SEED } from './seed.js';
+import { SEED } from './seed.js'; // rutina inicial hasta la primera sincronización
 
 const DB_NAME = 'entreno', STORE = 'kv';
 let dbp = null;
@@ -45,7 +45,9 @@ export function createStore({ fetchFn = (...a) => fetch(...a), onChange = () => 
   }
 
   async function setConfig(cfg) {
-    st.config = cfg && cfg.url ? { url: String(cfg.url).trim(), token: String(cfg.token || '').trim() } : null;
+    const nueva = cfg && cfg.url ? { url: String(cfg.url).trim(), token: String(cfg.token || '').trim() } : null;
+    if (!nueva || !st.config || nueva.url !== st.config.url) { st.ultimaSync = null; await set('ultimaSync', null); } // hoja distinta: se trata como primera vez
+    st.config = nueva;
     await set('config', st.config);
     st.error = '';
     emit();
@@ -74,24 +76,27 @@ export function createStore({ fetchFn = (...a) => fetch(...a), onChange = () => 
     enCurso = (async () => {
       st.sincronizando = true; emit();
       try {
+        // 0) primera vez con esta hoja: si está vacía, se le sube tu rutina y tus ejercicios locales antes que nada
+        if (!st.ultimaSync) {
+          const j0 = await llamar({ a: 'pull', token: st.config.token });
+          const srv = j0.data || {};
+          if (!(srv.ejercicios || []).length && !(srv.plantillas || []).length) {
+            const base = [...(st.filas.ejercicios || []).map(f => ({ op: 'put', hoja: 'ejercicios', fila: f })), ...(st.filas.plantillas || []).map(f => ({ op: 'put', hoja: 'plantillas', fila: f }))];
+            st.cola = [...base.map(o => ({ ...o, seq: ++colaSeq })), ...st.cola];
+            await set('cola', st.cola);
+          }
+        }
         // 1) subir cambios pendientes
         if (st.cola.length) {
           const lote = st.cola.slice();
           await llamar({}, { token: st.config.token, ops: lote.map(({ seq, ...o }) => o) });
-          const hasta = lote[lote.length - 1].seq;
-          st.cola = st.cola.filter(o => o.seq > hasta);
+          const enviados = new Set(lote.map(o => o.seq));
+          st.cola = st.cola.filter(o => !enviados.has(o.seq));
           await set('cola', st.cola);
         }
         // 2) bajar la hoja entera (es la fuente de verdad) y reaplicar lo que siga pendiente
         const j = await llamar({ a: 'pull', token: st.config.token });
         const filas = j.data || {};
-        // hoja recién creada y vacía: se le sube la rutina inicial
-        if (!(filas.ejercicios || []).length && !(filas.plantillas || []).length) {
-          const semilla = [...SEED.ejercicios.map(f => ({ op: 'put', hoja: 'ejercicios', fila: f })), ...SEED.plantillas.map(f => ({ op: 'put', hoja: 'plantillas', fila: f }))];
-          semilla.forEach(o => st.cola.push({ ...o, seq: ++colaSeq }));
-          await set('cola', st.cola);
-          otraVez = true;
-        }
         aplicarOps(filas, st.cola);
         st.filas = filas;
         st.ultimaSync = Date.now();

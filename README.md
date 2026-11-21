@@ -1,6 +1,6 @@
 # Entreno
 
-Libreta de entreno personal: pesos, repeticiones y carreras, sin bloat. PWA instalable (Android), funciona sin conexión y se sincroniza con una hoja de Google que Claude lee y escribe.
+Libreta de entreno personal: pesos, repeticiones, carreras y otros deportes, sin bloat. App de recuento y agenda, no de objetivos. PWA instalable (Android), funciona sin conexión y se sincroniza con una hoja de Google que Claude lee y escribe.
 
 - **App:** HTML/JS sin framework, alojada en GitHub Pages. Datos en el móvil (IndexedDB) y cola de cambios pendientes.
 - **Sincronización:** `apps-script/Code.gs`, implementado como aplicación web en la hoja de Google. La app sube los cambios por POST y baja la hoja entera al abrirse.
@@ -10,16 +10,21 @@ Libreta de entreno personal: pesos, repeticiones y carreras, sin bloat. PWA inst
 
 | Pestaña | Quién escribe | Columnas |
 |---|---|---|
-| ejercicios | Claude (y la app al editar rangos) | id, nombre, grupo, series, repMin, repMax, incremento, activo, notas |
-| plantillas | Claude | id, nombre, ejercicios (ids separados por comas, en orden) |
-| plan_semanal | Claude | id, semana (`2026-W48`), fecha (`AAAA-MM-DD`), hora, tipo (gimnasio/carrera/movilidad), plantilla, detalle, objetivo (sesiones de la semana), nota |
+| ejercicios | App y Claude | id, nombre, grupo, musculo, modo (kg/corporal/tiempo), series, repMin, repMax, incremento, activo, notas |
+| plantillas | App y Claude | id, nombre, ejercicios (ids separados por comas, en orden) |
+| plan_semanal | Claude | id, semana (`2026-W48`), fecha (`AAAA-MM-DD`), hora, tipo (gimnasio/carrera/movilidad/deporte), plantilla, detalle, nota (de la semana). La app no muestra objetivos |
 | revisiones | Claude | id, semana, resumen, ajustes, plan_siguiente |
 | sesiones | App | id, fecha, plantilla, nombre, nota, creado |
 | series | App | id, sesion, fecha, ejercicio, nombre, serie, peso, reps, obj_peso, obj_reps, nota |
 | carreras | App | id, fecha, km, tiempo, segundos, ritmo, tipo (suave/larga/series/test), sensacion, nota, creado |
 | movilidad | App | id, fecha, creado |
+| deportes | App | id, fecha, deporte (texto libre: Pádel, Surf…), minutos, sensacion, nota, creado |
 
-Todo se guarda como texto; los decimales llevan punto (`2.5`). Se pueden añadir columnas: la app ignora las que no conoce y no las borra.
+Todo se guarda como texto; los decimales llevan punto (`2.5`). Se pueden añadir columnas y pestañas: la app ignora lo que no conoce y no lo borra, y el Apps Script crea solo las pestañas nuevas (no hace falta volver a desplegarlo).
+
+Los ejercicios de una rutina pueden ser ids del catálogo (`js/catalogo.js`, 84 ejercicios con fotos) aunque no tengan fila en `ejercicios`: la app usa los valores del catálogo. Lo que se escriba en la hoja manda sobre el catálogo.
+
+Fotos de ejercicios: [free-exercise-db](https://github.com/yuhonas/free-exercise-db) (dominio público), convertidas a webp con `scripts/catalogo.py`.
 
 ## Desarrollo
 

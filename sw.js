@@ -1,8 +1,9 @@
 // Service worker: la app funciona sin conexión. Sube VERSION en cada cambio para que el móvil la actualice.
-const VERSION = 'entreno-1.0.0';
+const VERSION = 'entreno-1.1.0';
 const ARCHIVOS = [
   './', './index.html', './manifest.webmanifest', './css/app.css',
   './js/app.js', './js/store.js', './js/schema.js', './js/logic.js', './js/seed.js',
+  './js/util.js', './js/state.js', './js/vistas.js', './js/sesion.js', './js/catalogo.js',
   './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-192.png', './icons/maskable-512.png', './icons/favicon.png', './icons/apple-touch-icon.png',
   './fonts/barlow-condensed-latin-600-normal.woff2', './fonts/barlow-condensed-latin-700-normal.woff2',
   './fonts/inter-latin-400-normal.woff2', './fonts/inter-latin-600-normal.woff2',

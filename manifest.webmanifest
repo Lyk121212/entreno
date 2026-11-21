@@ -17,6 +17,6 @@
     { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    { "name": "Apuntar carrera", "url": "./#carrera", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+    { "name": "Apuntar carrera o deporte", "url": "./#actividad", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
   ]
 }

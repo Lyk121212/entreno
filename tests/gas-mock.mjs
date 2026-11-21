@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import vm from 'node:vm';
 
 class Sheet {
+  getName() { return this.name; }
   constructor(name) { this.name = name; this.cells = []; this.maxR = 1000; this.maxC = 26; }
   getLastRow() { for (let r = this.cells.length - 1; r >= 0; r--) if ((this.cells[r] || []).some(v => v !== '' && v != null)) return r + 1; return 0; }
   getLastColumn() { let m = 0; this.cells.forEach(row => { (row || []).forEach((v, c) => { if (v !== '' && v != null) m = Math.max(m, c + 1); }); }); return m; }
@@ -27,6 +28,7 @@ class Sheet {
 export class Spreadsheet {
   constructor() { this.sheets = {}; }
   getSheetByName(n) { return this.sheets[n] || null; }
+  getSheets() { return Object.values(this.sheets); }
   insertSheet(n) { return (this.sheets[n] = new Sheet(n)); }
   // ayudas para los tests
   tabla(n) { const sh = this.sheets[n]; if (!sh) return []; const lr = sh.getLastRow(), lc = sh.getLastColumn(); if (!lr) return []; const v = sh.getRange(1, 1, lr, lc).getValues(); return v.slice(1).filter(r => r.some(x => x !== '')).map(r => Object.fromEntries(v[0].map((k, i) => [k, r[i]]))); }
